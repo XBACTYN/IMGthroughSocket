@@ -32,7 +32,7 @@ public class Client {
                 // писать туда же
                 //out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                 path = "C:\\Users\\user\\Desktop\\Стеганография-2022\\Файлы для лабораторных\\Lab1\\leo.jpg";
-                in = new FileInputStream(new File(path));
+                //in = new FileInputStream(new File(path));
                 out = new DataOutputStream(clientSocket.getOutputStream());
 
 
@@ -40,7 +40,7 @@ public class Client {
                 int length = 0;
                 int counter = 0;
                 while(true) {
-                    System.out.println("Введите команду: ");
+                    System.out.println("Введите команду image/exit: ");
                     String word = reader.readLine();
                     if (word.equals("exit")){
                         out.writeUTF(word);
@@ -49,17 +49,26 @@ public class Client {
                     }
                     else if (word.equals("image"))
                     {
-                        System.out.println("Текущий путь картинки: "+path+"\nВведите новый путь: ");
-                        //path = reader.readLine();
                         out.writeUTF(word);
                         out.flush();
+                        System.out.println("Текущий путь изначальной картинки: "+path+"\nВвести новый путь yes/no?: ");
+                        String choice = reader.readLine();
+                        if (choice.equals("yes")){
+                            System.out.println("Введите путь: ");
+                            path = reader.readLine();
+                            System.out.println("Новый путь изначальной картинки : "+path);
+                        }
+                        else {
+                            System.out.println("Путь не меняется.");
+                        }
+                        in = new FileInputStream(new File(path));
                         while ((length = in.read(sendBytes, 0, sendBytes.length)) > 0) {
-                            counter +=length;
                             out.write(sendBytes, 0, length);
                             out.flush();
-                            System.out.println(length);
                         }
-                        System.out.println("Counter = "+counter);
+
+                        in.close();
+                        System.out.println("Финиш");
                     }
 
                 }

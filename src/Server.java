@@ -24,13 +24,8 @@ public class Server {
                 clientSocket = server.accept(); // accept() будет ждать пока
                 //кто-нибудь не захочет подключиться
                 try { // установив связь и воссоздав сокет для общения с клиентом можно перейти
-                    // к созданию потоков ввода/вывода.
-                    // теперь мы можем принимать сообщения
-                    //in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    // и отправлять
-                    //out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                     in = new DataInputStream(clientSocket.getInputStream());
-                    out = new FileOutputStream(new File("C:\\Users\\user\\Desktop\\test_soket\\leo.jpg"));
+                    String path="C:\\Users\\user\\Desktop\\test_soket\\";
 
                     byte[] inputByte = new byte[1024];
                     int length = 0;
@@ -47,16 +42,19 @@ public class Server {
                             }
                             if(word.equals("image"))
                             {
+                                String new_path = path + String.valueOf(counter)+".jpg";
+                                out = new FileOutputStream(new_path);
+                                System.out.println("Путь до сохраненного изображения :"+"\n"+new_path);
                                 while ((length = in.read(inputByte, 0, inputByte.length)) > 0)
                                 {
-                                    counter += length;
                                     System.out.println(length);
                                     out.write(inputByte, 0, length);
                                     out.flush();
-                                    System.out.println(length);
-                                    System.out.println("Counter = " + counter);
                                 }
+                                System.out.println("Финиш");
+                                out.close();
                             }
+                            counter++;
                             //System.out.println("Counter = " + counter);
                         }
 
@@ -80,15 +78,15 @@ public class Server {
                     System.out.println("Сокет закрыт!");
                     // потоки тоже хорошо бы закрыть
                     in.close();
-                    out.close();
+                    //out.close();
                 }
             } finally {
                 System.out.println("Сервер закрыт!");
                 server.close();
             }
         } catch (IOException e) {
-            System.out.println("Чето пошло не так");
-            System.err.println(e);
+            //System.out.println("Чето пошло не так");
+            //System.err.println(e);
         }
     }
 }
