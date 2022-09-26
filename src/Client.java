@@ -1,5 +1,6 @@
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
@@ -28,27 +29,39 @@ public class Client {
     }
 
 
-    public  static BufferedImage addPepperSaltNoise(BufferedImage srcImg, double param, String type)
+    public static BufferedImage addPepperSaltNoise(BufferedImage srcImg, double param)
         {
         int total = srcImg.getWidth() * srcImg.getHeight();
-        int count = new Double(total * (1 - param)).intValue();
+        int count = (int)(total * (1 - param));
         BufferedImage trgImg = clone(srcImg);
         Random random = new Random();
+        Color black = Color.BLACK;
+        Color white = Color.BLACK;
         for(int i = 0; i < count; i++)
         {
             int randomX = random.nextInt(srcImg.getWidth());
             int randomY = random.nextInt(srcImg.getHeight());
-            int newColor;
-            newColor = (random.nextInt(2) + 1) % 2 == 0 ? 0 : 255;
-            for(int k = 3 ; k >= 0; k--){
-                channels[k] = newColor;
-            }
-            int color = ImgUtils.colorToRgb(channels);
-            trgImg.setRGB(randomX, randomY, color);
-
+            int newColor = (random.nextInt(2) + 1) % 2 == 0 ? black.getRGB() : white.getRGB();
+            trgImg.setRGB(randomX, randomY, newColor);
         }
         return trgImg;
     }
+
+    public static File fileImageWithNoise(String srcPath, String trgPath, double p) throws IOException {
+        File file = new File(path);
+        BufferedImage image = ImageIO.read(file);
+        BufferedImage image2 = addPepperSaltNoise(image, p);
+        File outputFile = new File(trgPath);
+        ImageIO.write(image2, "jpg", outputFile);
+        return outputFile;
+    }
+
+    // сделать изображению с шумом путь, чтоб не затиралось
+
+    // сделать медианный фильтр
+    // входные параметры srcImage, bool[][] mask
+    // на выход отфильтрованное изображение
+
 
     public static void main(String[] args) {
         try {
@@ -91,7 +104,8 @@ public class Client {
                         else {
                             System.out.println("Путь не меняется.");
                         }
-                        in = new FileInputStream(new File(path));
+                        File file = fileImageWithNoise(path, "", 0.5);
+                        //in = new FileInputStream(new File(path));
                         while ((length = in.read(sendBytes, 0, sendBytes.length)) > 0) {
                             out.write(sendBytes, 0, length);
                             out.flush();
