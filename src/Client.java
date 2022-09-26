@@ -1,9 +1,14 @@
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-
+import java.util.Random;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 public class Client {
 
     private static Socket clientSocket; //сокет для общения
@@ -15,9 +20,34 @@ public class Client {
     private static DataOutputStream out;
     private static String path;
 
-    private String getIMG(String path)
-    {
-      return "0";
+    public static BufferedImage clone(BufferedImage bufferImage) {
+        ColorModel colorModel = bufferImage.getColorModel();
+        WritableRaster raster = bufferImage.copyData(null);
+        boolean isAlphaPremultiplied = colorModel.isAlphaPremultiplied();
+        return new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
+    }
+
+
+    public  static BufferedImage addPepperSaltNoise(BufferedImage srcImg, double param, String type)
+        {
+        int total = srcImg.getWidth() * srcImg.getHeight();
+        int count = new Double(total * (1 - param)).intValue();
+        BufferedImage trgImg = clone(srcImg);
+        Random random = new Random();
+        for(int i = 0; i < count; i++)
+        {
+            int randomX = random.nextInt(srcImg.getWidth());
+            int randomY = random.nextInt(srcImg.getHeight());
+            int newColor;
+            newColor = (random.nextInt(2) + 1) % 2 == 0 ? 0 : 255;
+            for(int k = 3 ; k >= 0; k--){
+                channels[k] = newColor;
+            }
+            int color = ImgUtils.colorToRgb(channels);
+            trgImg.setRGB(randomX, randomY, color);
+
+        }
+        return trgImg;
     }
 
     public static void main(String[] args) {
