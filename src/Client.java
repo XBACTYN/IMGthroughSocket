@@ -19,7 +19,8 @@ public class Client {
     //private static BufferedWriter out; // поток записи в сокет
     private static FileInputStream in;
     private static DataOutputStream out;
-    private static String path;
+    private static String folderPath;
+    private static String fileName;
 
     public static BufferedImage clone(BufferedImage bufferImage) {
         ColorModel colorModel = bufferImage.getColorModel();
@@ -48,7 +49,7 @@ public class Client {
     }
 
     public static File fileImageWithNoise(String srcPath, String trgPath, double p) throws IOException {
-        File file = new File(path);
+        File file = new File(srcPath);
         BufferedImage image = ImageIO.read(file);
         BufferedImage image2 = addPepperSaltNoise(image, p);
         File outputFile = new File(trgPath);
@@ -74,7 +75,8 @@ public class Client {
                 //in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 // писать туда же
                 //out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                path = "C:\\Users\\user\\Desktop\\Стеганография-2022\\Файлы для лабораторных\\Lab1\\leo.jpg";
+                folderPath = "C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
+                fileName = "Naruto.jpg";
                 //in = new FileInputStream(new File(path));
                 out = new DataOutputStream(clientSocket.getOutputStream());
 
@@ -94,18 +96,18 @@ public class Client {
                     {
                         out.writeUTF(word);
                         out.flush();
-                        System.out.println("Текущий путь изначальной картинки: "+path+"\nВвести новый путь yes/no?: ");
+                        System.out.println("Текущий путь изначальной картинки: "+folderPath+fileName+"\nВвести новый путь yes/no?: ");
                         String choice = reader.readLine();
                         if (choice.equals("yes")){
                             System.out.println("Введите путь: ");
-                            path = reader.readLine();
-                            System.out.println("Новый путь изначальной картинки : "+path);
+                            fileName = reader.readLine();
+                            System.out.println("Новый путь изначальной картинки : "+folderPath+fileName);
                         }
                         else {
                             System.out.println("Путь не меняется.");
                         }
-                        File file = fileImageWithNoise(path, "", 0.5);
-                        //in = new FileInputStream(new File(path));
+                        File file = fileImageWithNoise(folderPath+fileName, folderPath+counter+fileName, 0.3);
+                        in = new FileInputStream(new File(folderPath+counter+fileName));
                         while ((length = in.read(sendBytes, 0, sendBytes.length)) > 0) {
                             out.write(sendBytes, 0, length);
                             out.flush();

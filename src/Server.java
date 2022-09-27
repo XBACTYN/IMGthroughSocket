@@ -25,7 +25,7 @@ public class Server {
                 //кто-нибудь не захочет подключиться
                 try { // установив связь и воссоздав сокет для общения с клиентом можно перейти
                     in = new DataInputStream(clientSocket.getInputStream());
-                    String path="C:\\Users\\user\\Desktop\\test_soket\\";
+                    String path="C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
 
                     byte[] inputByte = new byte[1024];
                     int length = 0;
