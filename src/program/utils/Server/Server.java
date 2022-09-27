@@ -11,6 +11,8 @@ import java.util.Arrays;
 
 import program.utils.Pixel;
 
+import javax.imageio.ImageIO;
+
 
 public class Server {
 
@@ -27,8 +29,7 @@ public class Server {
         return new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
     }
 
-    private static BufferedImage MedianFilter(BufferedImage srcImg,int [][] mask)
-    {
+    private static void MedianFilter(BufferedImage srcImg,int [][] mask, String trgPath) throws IOException {
         //Pixel [][] pixels = new Pixel [3][3];
         int size = 9;
         Pixel [] pixels = new Pixel [size];
@@ -80,8 +81,8 @@ public class Server {
             }
         }
 
-
-        return trgImg;
+        File outputFile = new File(trgPath);
+        ImageIO.write(trgImg, "jpg", outputFile);
     }
 
     public static void main(String[] args) {
@@ -94,7 +95,9 @@ public class Server {
                 //кто-нибудь не захочет подключиться
                 try { // установив связь и воссоздав сокет для общения с клиентом можно перейти
                     in = new DataInputStream(clientSocket.getInputStream());
-                    String path="C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
+//                    String path="C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
+                    String folderPath = "C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
+                    String fileName = "noiseNaruto.jpg";
 
                     byte[] inputByte = new byte[1024];
                     int length = 0;
@@ -111,18 +114,25 @@ public class Server {
                             }
                             if(word.equals("image"))
                             {
-                                String new_path = path + String.valueOf(counter)+".jpg";
-                                String new_path2 = path + "noise"+String.valueOf(counter)+".jpg";
+                                String new_path = folderPath+ "noise" + counter + ".jpg";
                                 out = new FileOutputStream(new_path);
                                 System.out.println("Путь до сохраненного изображения :"+"\n"+new_path);
                                 while ((length = in.read(inputByte, 0, inputByte.length)) > 0)
                                 {
-                                    System.out.println(length);
+                                    //System.out.println(length);
                                     out.write(inputByte, 0, length);
                                     out.flush();
                                 }
+
+                                //???
+                                String new_path2 = folderPath + "filtred"+counter+".jpg";
+                                File file = new File(new_path);
+                                BufferedImage noiseImg = ImageIO.read(file);
+                                int mask [][] = {{1,1,1},{1,1,1},{1,1,1}};
+                                MedianFilter(noiseImg, mask, new_path2);
                                 System.out.println("Финиш");
                                 out.close();
+
                             }
                             counter++;
                             //System.out.println("Counter = " + counter);
