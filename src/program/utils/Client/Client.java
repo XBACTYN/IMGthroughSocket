@@ -77,7 +77,7 @@ public class Client {
                 //in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 // писать туда же
                 //out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                folderPath = "C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
+                folderPath = "C:\\Users\\kozlo\\IdeaProjects\\IMGthroughSocket\\src\\Pictures\\";
                 fileName = "Naruto.jpg";
                 //in = new FileInputStream(new File(path));
                 out = new DataOutputStream(clientSocket.getOutputStream());

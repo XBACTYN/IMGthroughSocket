@@ -96,7 +96,7 @@ public class Server {
                 try { // установив связь и воссоздав сокет для общения с клиентом можно перейти
                     in = new DataInputStream(clientSocket.getInputStream());
 //                    String path="C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
-                    String folderPath = "C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
+                    String folderPath = "C:\\Users\\kozlo\\IdeaProjects\\IMGthroughSocket\\src\\Pictures\\";
                     String fileName = "noiseNaruto.jpg";
 
                     byte[] inputByte = new byte[1024];
