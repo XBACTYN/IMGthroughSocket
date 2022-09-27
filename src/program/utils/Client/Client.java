@@ -1,3 +1,4 @@
+package program.utils.Client;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -34,7 +35,7 @@ public class Client {
         BufferedImage trgImg = clone(srcImg);
         Random random = new Random();
         Color black = Color.BLACK;
-        Color white = Color.BLACK;
+        Color white = Color.WHITE;
         for(int i = 0; i < count; i++)
         {
             int randomX = random.nextInt(srcImg.getWidth());

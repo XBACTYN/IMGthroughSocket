@@ -1,10 +1,14 @@
-import javax.imageio.ImageIO;
+package program.utils.Server;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.nio.ByteBuffer;
+import program.utils.Pixel;
+
 
 public class Server {
 
@@ -14,6 +18,39 @@ public class Server {
     //private static BufferedWriter out; // поток записи в сокет
     private static DataInputStream in;
     private static FileOutputStream out;
+    public static BufferedImage clone(BufferedImage bufferImage) {
+        ColorModel colorModel = bufferImage.getColorModel();
+        WritableRaster raster = bufferImage.copyData(null);
+        boolean isAlphaPremultiplied = colorModel.isAlphaPremultiplied();
+        return new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
+    }
+
+    private static BufferedImage MedianFilter(BufferedImage srcImg,int [][] mask)
+    {
+
+        Pixel [][] pixels = new Pixel [3][3];
+        BufferedImage trgImg = clone(srcImg);
+        int height = trgImg.getHeight();
+        int width = trgImg.getWidth();
+        for(int i=0;i<height;++i) {
+            for (int j = 0; j < width; ++j) {
+
+                pixels[0][0] =new Pixel(j-1,i-1,new Color(trgImg.getRGB(j-1,i-1)));
+                pixels[0][1] =new Pixel(j,i-1,new Color(trgImg.getRGB(j,i-1)));
+                pixels[0][2] =new Pixel(j+1,i-1,new Color(trgImg.getRGB(j+1,i-1)));
+                pixels[1][0] =new Pixel(j-1,i,new Color(trgImg.getRGB(j-1,i)));
+                pixels[1][1] =new Pixel(j,i,new Color(trgImg.getRGB(j,i)));
+                pixels[1][2] =new Pixel(j+1,i,new Color(trgImg.getRGB(j+1,i)));
+                pixels[2][0] =new Pixel(j-1,i+1,new Color(trgImg.getRGB(j-1,i+1)));
+                pixels[2][1] =new Pixel(j,i+1,new Color(trgImg.getRGB(j,i+1)));
+                pixels[2][2] =new Pixel(j+1,i+1,new Color(trgImg.getRGB(j+1,i+1)));
+
+
+
+            }
+        }
+        return trgImg;
+    }
 
     public static void main(String[] args) {
         try {
