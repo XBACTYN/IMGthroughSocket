@@ -4,10 +4,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.util.Random;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 public class Client {
@@ -20,6 +17,7 @@ public class Client {
     private static FileInputStream in;
     private static DataOutputStream out;
     private static String path;
+    private static String trg_path;
 
     public static BufferedImage clone(BufferedImage bufferImage) {
         ColorModel colorModel = bufferImage.getColorModel();
@@ -104,8 +102,10 @@ public class Client {
                         else {
                             System.out.println("Путь не меняется.");
                         }
-                        File file = fileImageWithNoise(path, "", 0.5);
-                        //in = new FileInputStream(new File(path));
+                        trg_path =path;
+                        trg_path= trg_path.replaceFirst(".jpg","_noise.jpg");
+                        File file = fileImageWithNoise(path, trg_path, 0.5);
+                        in = new FileInputStream(file);
                         while ((length = in.read(sendBytes, 0, sendBytes.length)) > 0) {
                             out.write(sendBytes, 0, length);
                             out.flush();
