@@ -29,25 +29,16 @@ public class Server {
         return new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
     }
 
-    private static void MedianFilter(BufferedImage srcImg,int [][] mask, String trgPath) throws IOException {
+    private static File MedianFilter(BufferedImage srcImg,int [][] mask, String trgPath) throws IOException {
         //Pixel [][] pixels = new Pixel [3][3];
         int size = 9;
         Pixel [] pixels = new Pixel [size];
         BufferedImage trgImg = clone(srcImg);
         int height = trgImg.getHeight();
         int width = trgImg.getWidth();
-        for(int i=0;i<height;++i) {
-            for (int j = 0; j < width; ++j) {
+        for(int i=1;i<height-1;++i) {
+            for (int j = 1; j < width-1; ++j) {
 
-//                pixels[0][0] =new Pixel(j-1,i-1,new Color(trgImg.getRGB(j-1,i-1)));
-//                pixels[0][1] =new Pixel(j,i-1,new Color(trgImg.getRGB(j,i-1)));
-//                pixels[0][2] =new Pixel(j+1,i-1,new Color(trgImg.getRGB(j+1,i-1)));
-//                pixels[1][0] =new Pixel(j-1,i,new Color(trgImg.getRGB(j-1,i)));
-//                pixels[1][1] =new Pixel(j,i,new Color(trgImg.getRGB(j,i)));
-//                pixels[1][2] =new Pixel(j+1,i,new Color(trgImg.getRGB(j+1,i)));
-//                pixels[2][0] =new Pixel(j-1,i+1,new Color(trgImg.getRGB(j-1,i+1)));
-//                pixels[2][1] =new Pixel(j,i+1,new Color(trgImg.getRGB(j,i+1)));
-//                pixels[2][2] =new Pixel(j+1,i+1,new Color(trgImg.getRGB(j+1,i+1)));
 
                 pixels[0] =new Pixel(j-1,i-1,new Color(trgImg.getRGB(j-1,i-1)));
                 pixels[1] =new Pixel(j,i-1,new Color(trgImg.getRGB(j,i-1)));
@@ -83,23 +74,25 @@ public class Server {
 
         File outputFile = new File(trgPath);
         ImageIO.write(trgImg, "jpg", outputFile);
+        return outputFile;
     }
 
     public static void main(String[] args) {
         try {
             try {
                 server = new ServerSocket(4004); // серверсокет прослушивает порт 4004
-                System.out.println("Сервер запущен!"); // хорошо бы серверу
+                System.out.println("Server online!"); // хорошо бы серверу
                 //   объявить о своем запуске
                 clientSocket = server.accept(); // accept() будет ждать пока
                 //кто-нибудь не захочет подключиться
                 try { // установив связь и воссоздав сокет для общения с клиентом можно перейти
                     in = new DataInputStream(clientSocket.getInputStream());
 //                    String path="C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
-                    String folderPath = "C:\\Users\\kozlo\\IdeaProjects\\IMGthroughSocket\\src\\Pictures\\";
-                    String fileName = "noiseNaruto.jpg";
+                    String folderPath = "C:\\Users\\dream\\IdeaProjects\\IMGthroughSocket\\src\\Filtered_Pictures\\";
+                    String fileName = "Naruto.jpg";
 
-                    byte[] inputByte = new byte[1024];
+
+                    //byte[] inputByte = new byte[1024];
                     int length = 0;
                     int counter = 0;
                     String word = "";
@@ -114,23 +107,29 @@ public class Server {
                             }
                             if(word.equals("image"))
                             {
-                                String new_path = folderPath+ "noise" + counter + ".jpg";
+                                byte[] inputByte = new byte[1024];
+                                String new_path = folderPath+ "noise" +counter + ".jpg";
                                 out = new FileOutputStream(new_path);
-                                System.out.println("Путь до сохраненного изображения :"+"\n"+new_path);
-                                while ((length = in.read(inputByte, 0, inputByte.length)) > 0)
+                                System.out.println("Save path :"+"\n"+new_path);
+                                int len = inputByte.length;
+                                while ((length = in.read(inputByte, 0, len)) >0)
                                 {
-                                    //System.out.println(length);
+
                                     out.write(inputByte, 0, length);
                                     out.flush();
+                                    System.out.println(counter);
+                                    if(length!=1024)
+                                        break;
                                 }
-
+                                System.out.println("Before filter");
+                                out.close();
                                 //???
                                 String new_path2 = folderPath + "filtred"+counter+".jpg";
                                 File file = new File(new_path);
                                 BufferedImage noiseImg = ImageIO.read(file);
                                 int mask [][] = {{1,1,1},{1,1,1},{1,1,1}};
-                                MedianFilter(noiseImg, mask, new_path2);
-                                System.out.println("Финиш");
+                                File file2 = MedianFilter(noiseImg, mask, new_path2);
+                                System.out.println("Finish");
                                 out.close();
 
                             }

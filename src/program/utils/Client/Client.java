@@ -77,7 +77,7 @@ public class Client {
                 //in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 // писать туда же
                 //out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                folderPath = "C:\\Users\\kozlo\\IdeaProjects\\IMGthroughSocket\\src\\Pictures\\";
+                folderPath = "C:\\Users\\dream\\IdeaProjects\\IMGthroughSocket\\src\\Pictures\\";
                 fileName = "Naruto.jpg";
                 //in = new FileInputStream(new File(path));
                 out = new DataOutputStream(clientSocket.getOutputStream());
@@ -87,7 +87,7 @@ public class Client {
                 int length = 0;
                 int counter = 0;
                 while(true) {
-                    System.out.println("Введите команду image/exit: ");
+                    System.out.println("Enter command image/exit: ");
                     String word = reader.readLine();
                     if (word.equals("exit")){
                         out.writeUTF(word);
@@ -98,28 +98,31 @@ public class Client {
                     {
                         out.writeUTF(word);
                         out.flush();
-                        System.out.println("Текущий путь изначальной картинки: "+folderPath+fileName+ "\nВвести новый путь yes/no?: ");
+                        System.out.println("Picture path: "+folderPath+fileName+ "\nChange path yes/no?: ");
                         String choice = reader.readLine();
                         if (choice.equals("yes")){
-                            System.out.println("Введите путь: ");
+                            System.out.println("Enter new path: ");
                             fileName = reader.readLine();
-                            System.out.println("Новый путь изначальной картинки : "+folderPath+fileName);
+                            System.out.println("New path now is : "+folderPath+fileName);
                         }
                         else {
-                            System.out.println("Путь не меняется.");
+                            System.out.println("Path not changed.");
                         }
 //                        trg_path =path;
 //                        trg_path= trg_path.replaceFirst(".jpg","_noise.jpg");
                         File file = fileImageWithNoise(folderPath+fileName, folderPath+"noise"+fileName, 0.5);
                         in = new FileInputStream(file);
                         while ((length = in.read(sendBytes, 0, sendBytes.length)) > 0) {
+                            counter +=length;
                             out.write(sendBytes, 0, length);
                             out.flush();
+
                         }
+                        System.out.println(counter);
 
                         in.close();
                         //удаление файла с шумом для экономии места
-                        System.out.println("Финиш");
+                        System.out.println("Finish");
                     }
 
                 }
