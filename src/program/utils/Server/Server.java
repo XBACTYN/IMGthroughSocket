@@ -30,25 +30,34 @@ public class Server {
     }
 
     private static File MedianFilter(BufferedImage srcImg,int [][] mask, String trgPath) throws IOException {
-        //Pixel [][] pixels = new Pixel [3][3];
-        int size = 9;
+        // маска квадратная
+        int n = mask.length;
+        int size = 0;
+        for (int[] ints : mask) {
+            for (int j = 0; j < n; ++j) {
+                size += ints[j];
+            }
+        }
         Pixel [] pixels = new Pixel [size];
         BufferedImage trgImg = clone(srcImg);
         int height = trgImg.getHeight();
         int width = trgImg.getWidth();
+        // идем по изображению
         for(int i=1;i<height-1;++i) {
-            for (int j = 1; j < width-1; ++j) {
+            for (int j = 1; j < width - 1; ++j) {
+                int cnt = 0;
+                // идем по маске в изображении
+                for (int k = -n/2; k <= n/2; ++k) {
+                    for (int l = -n / 2; l <= n / 2; ++l) {
+                        for (int r = 0; r < mask[k + n / 2][l + n / 2]; ++r) {
+                            pixels[cnt] = new Pixel(j - l, i - k, new Color(trgImg.getRGB(j - l, i - k)));
+//                            System.out.println("position: "+"("+k+";"+l+")");
+//                            System.out.println("cnt: "+cnt+" valye: "+pixels[cnt].c);
+                            cnt++;
+                        }
+                    }
+                }
 
-
-                pixels[0] =new Pixel(j-1,i-1,new Color(trgImg.getRGB(j-1,i-1)));
-                pixels[1] =new Pixel(j,i-1,new Color(trgImg.getRGB(j,i-1)));
-                pixels[2] =new Pixel(j+1,i-1,new Color(trgImg.getRGB(j+1,i-1)));
-                pixels[3] =new Pixel(j-1,i,new Color(trgImg.getRGB(j-1,i)));
-                pixels[4] =new Pixel(j,i,new Color(trgImg.getRGB(j,i)));
-                pixels[5] =new Pixel(j+1,i,new Color(trgImg.getRGB(j+1,i)));
-                pixels[6] =new Pixel(j-1,i+1,new Color(trgImg.getRGB(j-1,i+1)));
-                pixels[7] =new Pixel(j,i+1,new Color(trgImg.getRGB(j,i+1)));
-                pixels[8] =new Pixel(j+1,i+1,new Color(trgImg.getRGB(j+1,i+1)));
 
                 int[] redArray = new int[size];
                 int[] greenArray = new int[size];
@@ -87,15 +96,11 @@ public class Server {
                 //кто-нибудь не захочет подключиться
                 try { // установив связь и воссоздав сокет для общения с клиентом можно перейти
                     in = new DataInputStream(clientSocket.getInputStream());
-//                    String path="C:\\Users\\kozlo\\OneDrive\\Рабочий стол\\картинки\\";
-                    String folderPath = "C:\\Users\\dream\\IdeaProjects\\IMGthroughSocket\\src\\Filtered_Pictures\\";
-                    String fileName = "Naruto.jpg";
+                    String folderPath = "C:\\Users\\kozlo\\IdeaProjects\\IMGthroughSocket\\src\\ServersPictures\\";
 
-
-                    //byte[] inputByte = new byte[1024];
-                    int length = 0;
+                    int length;
                     int counter = 0;
-                    String word = "";
+                    String word;
 
                         while (true)
                         {
@@ -123,12 +128,30 @@ public class Server {
                                 }
                                 System.out.println("Before filter");
                                 out.close();
-                                //???
+
                                 String new_path2 = folderPath + "filtred"+counter+".jpg";
                                 File file = new File(new_path);
                                 BufferedImage noiseImg = ImageIO.read(file);
-                                int mask [][] = {{1,1,1},{1,1,1},{1,1,1}};
-                                File file2 = MedianFilter(noiseImg, mask, new_path2);
+                                int mask0 [][] = {{1,1,1},{1,1,1},{1,1,1}};
+                                int mask1 [][] = {{0,1,0},{1,1,1},{0,1,0}};
+                                int mask2 [][] = {{0,1,0},{1,3,1},{0,1,0}};
+                                int mask3 [][] = {{0,0,1,0,0},{0,0,2,0,0},{1,2,1,2,1},{0,0,2,0,0},{0,0,1,0,0}};
+                                File file2 = MedianFilter(noiseImg, mask2, new_path2);
+
+                                // тест на обработку несколько раз для лучшего качества
+                                ++counter;
+                                String new_path3 = folderPath + "filtred"+counter+".jpg";
+                                File file3 = MedianFilter(noiseImg, mask0, new_path3);
+
+                                BufferedImage filtredImg = ImageIO.read(file2);
+                                ++counter;
+                                String new_path4 = folderPath + "filtred"+counter+".jpg";
+                                File file4 = MedianFilter(filtredImg, mask3, new_path4);
+
+                                BufferedImage filtred2Img = ImageIO.read(file4);
+                                ++counter;
+                                String new_path5 = folderPath + "filtred"+counter+".jpg";
+                                File file5 = MedianFilter(filtred2Img, mask1, new_path5);
                                 System.out.println("Finish");
                                 out.close();
 
@@ -137,21 +160,6 @@ public class Server {
                             //System.out.println("Counter = " + counter);
                         }
 
-
-                    //System.out.println("Received " + image.getHeight() + "x" + image.getWidth() );
-                    //ImageIO.write(image, "jpg", new File("C:\\Users\\user\\Desktop\\test_soket\\leo.jpg"));
-
-                    /*
-                    while(true) {
-                        String word = in.readLine(); // ждём пока клиент что-нибудь нам напишет
-                        System.out.println(word);
-                        // не долго думая отвечает клиенту
-                        out.write("Привет, это Сервер! Подтверждаю, вы написали : " + word + "\n");
-                        out.flush(); // выталкиваем все из буфера
-                        if (word.equals("exit"))
-                            break;
-                    }
-                */
                 } finally { // в любом случае сокет будет закрыт
                     clientSocket.close();
                     System.out.println("Сокет закрыт!");
